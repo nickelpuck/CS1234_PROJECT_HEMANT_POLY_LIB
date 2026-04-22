@@ -3,36 +3,36 @@
 
 #include "poly.h"
 
-// ─── Graph Structure ──────────────────────────────────────────────────────────
+//Graph Struct
 typedef struct {
-    int   n;          // number of vertices
-    int **adj;        // adj[i][j] = 1 if edge i->j exists
-    char **labels;    // vertex labels
+    int n; // no of vertices
+    int **adj;  // adj[i][j] = 1 if edge i->j exists
+    char **labels;// vertex labels
 } Graph;
 
-// ─── Create / Destroy ─────────────────────────────────────────────────────────
+//Create/Destroy
 Graph *graph_create(int n);
-void   graph_destroy(Graph *g);
-void   graph_add_edge(Graph *g, int u, int v);
-void   graph_add_directed_edge(Graph *g, int u, int v);
-void   graph_set_label(Graph *g, int v, const char *label);
-void   graph_print(const Graph *g);
-void   graph_print_matrix(const Graph *g);
+void graph_destroy(Graph *g);
+void graph_add_edge(Graph *g, int u, int v);
+void graph_add_directed_edge(Graph *g, int u, int v);
+void graph_set_label(Graph *g, int v, const char *label);
+void graph_print(const Graph *g);
+void graph_print_matrix(const Graph *g);
 
-// ─── Graph Properties ─────────────────────────────────────────────────────────
-int    graph_degree(const Graph *g, int v);
-int    graph_edge_count(const Graph *g);
-int    graph_is_connected(const Graph *g);
-int   *graph_bfs_order(const Graph *g, int start, int *count);
-int   *graph_dfs_order(const Graph *g, int start, int *count);
-int    graph_has_cycle(const Graph *g);
-int   *graph_connected_components(const Graph *g, int *num_components);
+//Graph Properties
+int graph_degree(const Graph *g, int v);
+int graph_edge_count(const Graph *g);
+int graph_is_connected(const Graph *g);
+int *graph_bfs_order(const Graph *g, int start, int *count);
+int *graph_dfs_order(const Graph *g, int start, int *count);
+int graph_has_cycle(const Graph *g);
+int *graph_connected_components(const Graph *g, int *num_components);
 
-// ─── Characteristic Polynomial ────────────────────────────────────────────────
-// det(lambda*I - A): roots are eigenvalues of adjacency matrix
+//Characteristic Polyn
+// det(lambda*I - A):roots are eigenvalues of adjacency matrix
 Poly  *graph_characteristic_poly(const Graph *g);
 
-// ─── Spectral Graph Theory ────────────────────────────────────────────────────
+//Spectral Graph Theory
 // Compute spectrum (eigenvalue approximations) from characteristic poly
 double *graph_spectrum(const Graph *g, int *count);
 // Algebraic connectivity (2nd smallest eigenvalue of Laplacian ~ Fiedler value)
