@@ -5,8 +5,7 @@
 #include <math.h>
 #include <time.h>
 
-// ─── Reed-Solomon ─────────────────────────────────────────────────────────────
-
+//Reed-Solomon 
 RSCode *rs_create(int n, int k) {
     if (n <= 0 || k <= 0 || k > n) return NULL;
     RSCode *rs = (RSCode *)malloc(sizeof(RSCode));
@@ -16,10 +15,9 @@ RSCode *rs_create(int n, int k) {
     rs->points = (double *)malloc(n * sizeof(double));
     if (!rs->points) { free(rs); return NULL; }
     for (int i = 0; i < n; i++)
-        rs->points[i] = (double)(i + 1);  // evaluation points: 1, 2, ..., n
+        rs->points[i] = (double)(i + 1);  //evaluatn pts:1,2,..,n
     return rs;
 }
-
 void rs_destroy(RSCode *rs) {
     if (!rs) return;
     free(rs->points);
@@ -29,17 +27,15 @@ void rs_destroy(RSCode *rs) {
 double *rs_encode(const RSCode *rs, double *message) {
     if (!rs || !message) return NULL;
 
-    // Build polynomial from message coefficients
+    //Build poly from msg coeff
     Poly *p = poly_from_array(message, rs->k - 1);
     if (!p) return NULL;
-
     double *codeword = (double *)malloc(rs->n * sizeof(double));
     if (!codeword) { poly_destroy(p); return NULL; }
 
-    // Evaluate at each point
+    //Evaluate at each pt
     for (int i = 0; i < rs->n; i++)
         codeword[i] = poly_eval_horner(p, rs->points[i]);
-
     poly_destroy(p);
     return codeword;
 }
@@ -51,7 +47,6 @@ double *rs_decode(const RSCode *rs, double *codeword) {
     double *xs = (double *)malloc(rs->n * sizeof(double));
     double *ys = (double *)malloc(rs->n * sizeof(double));
     int valid = 0;
-
     for (int i = 0; i < rs->n; i++) {
         if (!isnan(codeword[i])) {
             xs[valid] = rs->points[i];
@@ -66,17 +61,16 @@ double *rs_decode(const RSCode *rs, double *codeword) {
         return NULL;
     }
 
-    // Use first k valid points for Lagrange interpolation
+    // Use 1st k valid pts for Lagrange interpolatn
     Poly *p = lagrange_interpolate(xs, ys, rs->k);
     free(xs); free(ys);
     if (!p) return NULL;
 
-    // Extract message coefficients
+    // Extract msg coeff
     double *message = (double *)calloc(rs->k, sizeof(double));
     if (!message) { poly_destroy(p); return NULL; }
     for (int i = 0; i < rs->k && i <= p->degree; i++)
         message[i] = round(p->coeffs[i]);
-
     poly_destroy(p);
     return message;
 }
@@ -98,7 +92,7 @@ void rs_corrupt(double *codeword, int n, int num_errors) {
 
 int rs_is_valid(const RSCode *rs, double *codeword) {
     if (!rs || !codeword) return 0;
-    // Interpolate from first k points, check rest
+    // Interpolate from 1st k pts, check rest
     double *xs = (double *)malloc(rs->k * sizeof(double));
     double *ys = (double *)malloc(rs->k * sizeof(double));
     for (int i = 0; i < rs->k; i++) {
@@ -128,8 +122,7 @@ void rs_print_codeword(double *codeword, int n) {
     printf(" ]\n");
 }
 
-// ─── Polynomial Checksum ──────────────────────────────────────────────────────
-
+// Polyn Checksum 
 Poly *checksum_generator(int degree) {
     // Simple generator: x^degree + x + 1
     Poly *g = poly_create(degree);
@@ -141,13 +134,13 @@ Poly *checksum_generator(int degree) {
 
 Poly *checksum_compute(const char *data, int len, Poly *generator) {
     if (!data || !generator) return NULL;
-    // Build polynomial from data bytes
+    // Build polyn from data bytes
     Poly *msg = poly_create(len - 1);
     for (int i = 0; i < len; i++)
         msg->coeffs[i] = (double)(unsigned char)data[i];
     poly_normalize(msg);
 
-    // Remainder = msg mod generator
+    // Rem = msg mod generator
     Poly *rem = poly_mod(msg, generator);
     poly_destroy(msg);
     return rem;
@@ -161,28 +154,28 @@ int checksum_verify(const char *data, int len, Poly *generator, Poly *checksum) 
     return ok;
 }
 
-// ─── Simplified Error Correction (Berlekamp-Welch style) ─────────────────────
-// Given n (x,y) pairs where at most e are wrong,
-// find polynomial of degree < k passing through at least n-e points.
+//Simplified Error Correctn (Berlekamp-Welch style)
+// Given n(x,y) pairs where at most e are wrong,
+// find polyn of deg< k passing through at least n-e points.
 // Uses the key equation: E(x)*f(x) = Q(x) where deg(E)=e, deg(Q)=e+k-1
-// Solve linear system for coefficients.
+// Solve linear syst for coeff.
 
 Poly *rs_error_correct(double *xs, double *ys, int n, int k, int max_errors) {
     if (!xs || !ys || n <= 0) return NULL;
     int e = max_errors;
-    // Degree of Q = e + k - 1, degree of E = e
-    // Unknowns: Q has e+k coefficients, E has e coefficients (leading coeff = 1)
-    // Total unknowns = e + k + e = 2e + k
+    // Deg(Q)=e+k-1,deg(E)=e
+    // Unknowns:Q has e+k coeff, E has e coeff(leading coeff = 1)
+    // Total unknowns =e+k+e=2e+k
     int q_deg = e + k - 1;
-    int unknowns = (q_deg + 1) + e;  // Q coeffs + E coeffs (excl. leading)
+    int unknowns = (q_deg + 1) + e;  //Q coeffs+E coeffs(excl. leading)
 
     if (n < unknowns) {
-        // Not enough points, fall back to plain Lagrange
+        // Not enough pts,fall back to plain Lagrange
         return lagrange_interpolate(xs, ys, k);
     }
 
-    // Build linear system: for each point i:
-    // Q(xi) - yi * E(xi) = 0
+    // Build linear syst:for each point i:
+    // Q(xi)-yi*E(xi)=0
     // sum_{j=0}^{q_deg} q_j * xi^j - yi * (xi^e + sum_{j=0}^{e-1} e_j * xi^j) = 0
     // Rearranged: sum q_j * xi^j - yi * sum_{j=0}^{e-1} e_j * xi^j = yi * xi^e
 
@@ -203,24 +196,24 @@ Poly *rs_error_correct(double *xs, double *ys, int n, int k, int max_errors) {
             A[i][q_deg + 1 + j] = -ys[i] * xpow;
             xpow *= xs[i];
         }
-        // RHS: yi * xi^e
+        //RHS:yi*xi^e
         b[i] = ys[i] * pow(xs[i], e);
     }
 
-    // Gaussian elimination
+    //Gaussian eliminatn
     double *sol = (double *)calloc(unknowns, sizeof(double));
     int rows = n < unknowns ? n : unknowns;
     for (int col = 0; col < rows; col++) {
-        // Find pivot
+        //Find pivot
         int pivot = -1;
         for (int row = col; row < n; row++) {
             if (fabs(A[row][col]) > 1e-9) { pivot = row; break; }
         }
         if (pivot < 0) continue;
-        // Swap
+        //Swap
         double *tmp = A[col]; A[col] = A[pivot]; A[pivot] = tmp;
         double tb = b[col]; b[col] = b[pivot]; b[pivot] = tb;
-        // Eliminate
+        //Eliminate
         double scale = A[col][col];
         for (int j = col; j < unknowns; j++) A[col][j] /= scale;
         b[col] /= scale;
@@ -233,17 +226,17 @@ Poly *rs_error_correct(double *xs, double *ys, int n, int k, int max_errors) {
     }
     for (int i = 0; i < rows; i++) sol[i] = b[i];
 
-    // Extract Q and E polynomials
+    //Extr Q&E poly
     Poly *Q = poly_create(q_deg);
     for (int j = 0; j <= q_deg; j++) Q->coeffs[j] = sol[j];
     poly_normalize(Q);
 
     Poly *E = poly_create(e);
-    E->coeffs[e] = 1.0;  // monic
+    E->coeffs[e] = 1.0;  //monic
     for (int j = 0; j < e; j++) E->coeffs[j] = sol[q_deg + 1 + j];
     poly_normalize(E);
 
-    // f = Q / E
+    //f=Q/E
     Poly **dm = poly_divmod(Q, E);
     Poly *f = NULL;
     if (dm) {
