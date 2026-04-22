@@ -1,13 +1,13 @@
-CC      = gcc
-CFLAGS  = -Wall -Wextra -g
+CC = gcc
+CFLAGS = -Wall -Wextra -g
 LDFLAGS = -lm
 
-LIB_SRCS = poly.c graph.c crypto.c codes.c
-LIB_OBJS = poly.o graph.o crypto.o codes.o
-LIB_A    = libpoly.a
+LIB_SRCS= poly.c graph.c crypto.c codes.c
+LIB_OBJS =poly.o graph.o crypto.o codes.o
+LIB_A= libpoly.a
 
-MAIN_SRC = main.c
-TARGET   = polydemo
+MAIN_SRC=main.c
+TARGET=polydemo
 
 all: $(LIB_A) $(TARGET)
 
