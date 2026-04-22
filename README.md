@@ -1,11 +1,11 @@
 # Polynomial + Graph Theory + Cryptography Library
 ## CS1234 Small-Scale Application Development
 
-A comprehensive C library bridging **polynomial algebra**, **graph theory**, **cryptography**, and **coding theory**. Connects CS1234 (C programming, data structures) with CS1202 (Discrete Mathematics, Graph Theory).
+A comprehensive C library bridging **polynomial algebra**, **graph theory**, **cryptography**, and **coding theory**. CS1234(C programming, data structures) with CS1202 (Discrete Mathematics, Graph Theory).
 
 **Name:** Hemant Kumar Ujjwal [CS25B031] (Github:nickelpuck)
 
----
+
 
 ## Modules
 
