@@ -1,40 +1,55 @@
-# Polynomial + Graph Theory Library — CS1234 Project
+# Polynomial + Graph Theory + Cryptography Library
+## CS1234 Small-Scale Application Development
 
-A C library combining **polynomial arithmetic** with **graph theory** via characteristic, chromatic, and matching polynomials. Bridges CS1234 (C programming, data structures) and CS1202 (Discrete Mathematics, Graph Theory).
+A comprehensive C library bridging **polynomial algebra**, **graph theory**, **cryptography**, and **coding theory**. Connects CS1234 (C programming, data structures) with CS1202 (Discrete Mathematics, Graph Theory).
 
-**Author:** Hemant Kumar (hkujjwal2468)  
-**Course:** CS1234 Small-Scale Application Development
+**Author:** Hemant Kumar (hkujjwal2468)
 
 ---
 
-## Features
+## Modules
 
-### Polynomial Library (`poly.h`, `poly.c`)
-- Create polynomials from coefficient arrays
-- Add, subtract, multiply, scalar multiply, negate
-- Evaluate using direct method and **Horner's method**
+### 1. Polynomial Library (`poly.h`, `poly.c`)
+- Create, add, subtract, multiply, scalar multiply, negate
+- Evaluate: direct method + **Horner's method**
 - **Differentiate** and **integrate** (symbolic)
-- Polynomial **long division** — quotient + remainder
-- **GCD** of two polynomials (Euclidean algorithm)
-- **Composition**: f(g(x))
+- Polynomial **long division** (quotient + remainder)
+- **GCD** via Euclidean algorithm
+- **Composition** f(g(x))
 - **Root finding**: quadratic formula + Newton's method
-- **Modular arithmetic**: reduce coefficients mod prime p
-- **Irreducibility test** over finite fields Z_p
+- **Modular arithmetic** over Z_p (finite fields)
+- **Irreducibility test** over Z_p
 - **Cyclotomic polynomials** Phi_n(x)
 - **Polynomial hashing** (Horner mod m)
-- Save / load polynomials to / from files
+- File save / load
 
-### Graph Theory Library (`graph.h`, `graph.c`)
-- Adjacency matrix graph representation
-- Add edges (directed / undirected), vertex labels
-- **BFS** and **DFS** traversal
-- Connectivity check, cycle detection
-- Connected components
-- **Characteristic polynomial** det(λI - A) — eigenvalues of adjacency matrix
-- **Chromatic polynomial** P(G, k) via deletion-contraction (counts k-colorings)
-- **Chromatic number** (minimum colors needed)
+### 2. Graph Theory Library (`graph.h`, `graph.c`)
+- Adjacency matrix representation, BFS, DFS
+- Connectivity, cycle detection, connected components
+- **Characteristic polynomial** det(λI - A)
+- **Spectral graph theory**: eigenvalues, spectral gap, algebraic connectivity (Fiedler value), cospectral detection
+- **Chromatic polynomial** P(G,k) via deletion-contraction
+- **Chromatic number**
+- **Tutte polynomial** T(G; x, y) — generalizes chromatic + matching + reliability
+  - T(1,1) = number of spanning trees
+  - T(2,0) = number of acyclic orientations
+  - T(1,2) = number of connected spanning subgraphs
 - **Matching polynomial** and k-matching count
-- Save / load graphs to / from files
+- **Reliability polynomial** R(G, p)
+- Graph file save / load
+
+### 3. Cryptography (`crypto.h`, `crypto.c`)
+- **Shamir's Secret Sharing**: split secret into n shares, reconstruct from any k
+- **Lagrange interpolation** (real-valued and over Z_p)
+- **Rabin-Karp string search** via polynomial fingerprinting + rolling hash
+- **Polynomial file fingerprinting** (checksum)
+- Modular arithmetic: fast exponentiation, modular inverse (Fermat's little theorem)
+
+### 4. Error Correcting Codes (`codes.h`, `codes.c`)
+- **Reed-Solomon encoding**: message → polynomial → evaluate at n points
+- **Reed-Solomon decoding**: recover message from codeword with erasures
+- **Berlekamp-Welch error correction**: recover polynomial from corrupted evaluations
+- **Polynomial checksum** (CRC-like): compute and verify data integrity
 
 ---
 
@@ -42,12 +57,12 @@ A C library combining **polynomial arithmetic** with **graph theory** via charac
 
 | File | Description |
 |------|-------------|
-| `poly.h` | Polynomial header — declarations + struct |
-| `poly.c` | Polynomial library implementation |
-| `graph.h` | Graph header — declarations + struct |
-| `graph.c` | Graph library implementation |
-| `main.c` | Driver with 15 demos |
-| `Makefile` | Builds `libpoly.a` + `polydemo` binary |
+| `poly.h / poly.c` | Polynomial library |
+| `graph.h / graph.c` | Graph theory library |
+| `crypto.h / crypto.c` | Cryptography (Shamir, Rabin-Karp, Lagrange) |
+| `codes.h / codes.c` | Error correcting codes (Reed-Solomon) |
+| `main.c` | Driver with 22 demos |
+| `Makefile` | Builds `libpoly.a` + `polydemo` |
 
 ---
 
@@ -57,99 +72,50 @@ A C library combining **polynomial arithmetic** with **graph theory** via charac
 make
 ```
 
-Requires: `gcc`, `make`, standard C library + `libm`.  
-No extra installation needed. Works on Linux / macOS / DCF.
+Requires: `gcc`, `make`, standard C + `libm`. No extra installation needed.
+Works on Linux / macOS / DCF machines.
 
 ---
 
 ## Running
 
-### Full demo (all 15 features):
-
+### Full demo (all 22 features):
 ```bash
 ./polydemo
 ```
 
-### CLI mode — Polynomial operations:
-
-Polynomial file format (degree on line 1, then coefficients constant-first):
-```
-2
-1
-2
-3
-```
-(represents 3x^2 + 2x + 1)
-
-```bash
-./polydemo eval  poly_a.txt 5.0       # evaluate at x=5
-./polydemo diff  poly_a.txt           # differentiate
-./polydemo integ poly_a.txt           # integrate
-./polydemo add   poly_a.txt poly_b.txt
-./polydemo mul   poly_a.txt poly_b.txt
-./polydemo gcd   poly_a.txt poly_b.txt
-./polydemo compose poly_a.txt poly_b.txt
-```
-
-### CLI mode — Graph operations:
-
-Graph file format (n on line 1, then n x n adjacency matrix):
-```
-3
-0 1 1
-1 0 1
-1 1 0
-```
-
-```bash
-./polydemo ginfo     graph.txt    # print graph info, connectivity
-./polydemo charpoly  graph.txt    # characteristic polynomial
-./polydemo chrompoly graph.txt    # chromatic polynomial + chromatic number
-./polydemo matching  graph.txt    # matching polynomial
-```
-
 ---
 
-## Sample Output
+## Demo Overview
 
-```
-╔══════════════════════════════════════╗
-║  Polynomial + Graph Library (CS1234) ║
-╚══════════════════════════════════════╝
-
-DEMO 1: Basic Arithmetic
-A = 3x^2 + 2x + 1
-B = x^2 - x + 4
-A + B = 4x^2 + x + 5
-A * B = 3x^4 - x^3 + 15x^2 + 6x + 4
-
-DEMO 10: Characteristic Polynomial
-Graph: Cycle C4
-Characteristic poly: x^4 - 4x^2
-lambda = -2 is an eigenvalue
-lambda =  0 is an eigenvalue
-lambda =  2 is an eigenvalue
-
-DEMO 11: Chromatic Polynomial
-Graph: Triangle K3
-P(G, k) = k^3 - 3k^2 + 2k
-k=1: 0 colorings
-k=2: 0 colorings
-k=3: 6 colorings
-Chromatic number: 3
-
-DEMO 14: Cyclotomic Polynomials
-Phi_1(x) = x - 1
-Phi_2(x) = x + 1
-Phi_3(x) = x^2 + x + 1
-Phi_4(x) = x^2 + 1
-Phi_6(x) = x^2 - x + 1
-```
+| # | Demo | Concept |
+|---|------|---------|
+| 1 | Basic arithmetic | Polynomial algebra |
+| 2 | Evaluation | Horner's method |
+| 3 | Calculus | Differentiation, integration |
+| 4 | Division | Long division algorithm |
+| 5 | GCD | Euclidean algorithm |
+| 6 | Composition | f(g(x)) |
+| 7 | Root finding | Newton's method |
+| 8 | File I/O | State persistence |
+| 9 | Cyclotomic | Number theory |
+| 10 | Finite fields | Z_p arithmetic, irreducibility |
+| 11 | Graph traversal | BFS, DFS |
+| 12 | Spectral theory | Eigenvalues, Fiedler value |
+| 13 | Chromatic poly | Graph coloring |
+| 14 | Tutte polynomial | Spanning trees, orientations |
+| 15 | Reliability poly | Network reliability |
+| 16 | Matching poly | Combinatorics |
+| 17 | Lagrange interp | Polynomial reconstruction |
+| 18 | Shamir sharing | Cryptographic secret sharing |
+| 19 | Rabin-Karp | String search via hashing |
+| 20 | Reed-Solomon | Error correcting codes |
+| 21 | Checksum | Data integrity (CRC-like) |
+| 22 | Berlekamp-Welch | Error correction |
 
 ---
 
 ## Clean
-
 ```bash
 make clean
 ```
