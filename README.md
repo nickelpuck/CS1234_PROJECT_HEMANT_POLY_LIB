@@ -3,7 +3,7 @@
 
 A comprehensive C library bridging **polynomial algebra**, **graph theory**, **cryptography**, and **coding theory**. Connects CS1234 (C programming, data structures) with CS1202 (Discrete Mathematics, Graph Theory).
 
-**Author:** Hemant Kumar (hkujjwal2468)
+**Name:** Hemant Kumar Ujjwal [CS25B031] (Github:nickelpuck)
 
 ---
 
@@ -56,7 +56,7 @@ A comprehensive C library bridging **polynomial algebra**, **graph theory**, **c
 ## Files
 
 | File | Description |
-|------|-------------|
+
 | `poly.h / poly.c` | Polynomial library |
 | `graph.h / graph.c` | Graph theory library |
 | `crypto.h / crypto.c` | Cryptography (Shamir, Rabin-Karp, Lagrange) |
@@ -89,7 +89,7 @@ Works on Linux / macOS / DCF machines.
 ## Demo Overview
 
 | # | Demo | Concept |
-|---|------|---------|
+
 | 1 | Basic arithmetic | Polynomial algebra |
 | 2 | Evaluation | Horner's method |
 | 3 | Calculus | Differentiation, integration |
