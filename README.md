@@ -72,17 +72,16 @@ A comprehensive C library bridging **polynomial algebra**, **graph theory**, **c
 make
 ```
 
-Requires: `gcc`, `make`, standard C + `libm`. No extra installation needed.
-Works on Linux / macOS / DCF machines.
+Requires: `gcc`, `make`, standard C + `libm`. No extra installatn req.
 
 ---
 
 ## Running
 
 ### Full demo (all 22 features):
-```bash
+
 ./polydemo
-```
+
 
 ---
 
