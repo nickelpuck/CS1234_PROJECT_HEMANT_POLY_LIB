@@ -68,9 +68,8 @@ A comprehensive C library bridging **polynomial algebra**, **graph theory**, **c
 
 ## Compilation
 
-```bash
+
 make
-```
 
 Requires: `gcc`, `make`, standard C + `libm`. No extra installatn req.
 
@@ -115,6 +114,6 @@ Requires: `gcc`, `make`, standard C + `libm`. No extra installatn req.
 ---
 
 ## Clean
-```bash
+
 make clean
-```
+
