@@ -4,8 +4,7 @@
 #include <string.h>
 #include <math.h>
 
-// ─── Create / Destroy ─────────────────────────────────────────────────────────
-
+//Create/Destroy
 Graph *graph_create(int n) {
     if (n <= 0) return NULL;
     Graph *g = (Graph *)malloc(sizeof(Graph));
@@ -79,15 +78,13 @@ void graph_print_matrix(const Graph *g) {
     }
 }
 
-// ─── Graph Properties ─────────────────────────────────────────────────────────
-
+//Graph Properties
 int graph_degree(const Graph *g, int v) {
     if (!g || v < 0 || v >= g->n) return -1;
     int deg = 0;
     for (int j = 0; j < g->n; j++) deg += g->adj[v][j];
     return deg;
 }
-
 int graph_edge_count(const Graph *g) {
     if (!g) return 0;
     int count = 0;
@@ -96,7 +93,6 @@ int graph_edge_count(const Graph *g) {
             if (g->adj[i][j]) count++;
     return count;
 }
-
 int *graph_bfs_order(const Graph *g, int start, int *count) {
     if (!g || start < 0 || start >= g->n) return NULL;
     int *order   = (int *)malloc(g->n * sizeof(int));
@@ -118,7 +114,6 @@ int *graph_bfs_order(const Graph *g, int start, int *count) {
     free(visited); free(queue);
     return order;
 }
-
 int *graph_dfs_order(const Graph *g, int start, int *count) {
     if (!g || start < 0 || start >= g->n) return NULL;
     int *order   = (int *)malloc(g->n * sizeof(int));
@@ -139,7 +134,6 @@ int *graph_dfs_order(const Graph *g, int start, int *count) {
     free(visited); free(stack);
     return order;
 }
-
 int graph_is_connected(const Graph *g) {
     if (!g || g->n == 0) return 1;
     int count;
@@ -148,7 +142,6 @@ int graph_is_connected(const Graph *g) {
     free(order);
     return result;
 }
-
 static int _dfs_cycle(const Graph *g, int u, int parent, int *visited) {
     visited[u] = 1;
     for (int v = 0; v < g->n; v++) {
@@ -159,7 +152,6 @@ static int _dfs_cycle(const Graph *g, int u, int parent, int *visited) {
     }
     return 0;
 }
-
 int graph_has_cycle(const Graph *g) {
     if (!g) return 0;
     int *visited = (int *)calloc(g->n, sizeof(int));
@@ -196,8 +188,7 @@ int *graph_connected_components(const Graph *g, int *num_components) {
     return comp;
 }
 
-// ─── Characteristic Polynomial ────────────────────────────────────────────────
-
+//Characteristic Poly
 static Poly ***_poly_matrix_alloc(int n) {
     Poly ***M = (Poly ***)malloc(n * sizeof(Poly **));
     for (int i = 0; i < n; i++)
@@ -266,14 +257,12 @@ Poly *graph_characteristic_poly(const Graph *g) {
     return result;
 }
 
-// ─── Spectral Graph Theory ────────────────────────────────────────────────────
-
+//Spectral Graph Theory
 // Find real roots of characteristic poly using Newton's method with multiple starts
 double *graph_spectrum(const Graph *g, int *count) {
     if (!g) { *count = 0; return NULL; }
     Poly *cp = graph_characteristic_poly(g);
     if (!cp) { *count = 0; return NULL; }
-
     int n = g->n;
     double *eigenvalues = (double *)malloc(n * sizeof(double));
     int found = 0;
@@ -302,7 +291,6 @@ double *graph_spectrum(const Graph *g, int *count) {
     poly_destroy(cp);
     return eigenvalues;
 }
-
 // Laplacian matrix: L = D - A, algebraic connectivity = 2nd smallest eigenvalue
 double graph_algebraic_connectivity(const Graph *g) {
     if (!g) return 0.0;
@@ -450,8 +438,7 @@ int graph_chromatic_number(const Graph *g) {
     return chi;
 }
 
-// ─── Matching Polynomial ──────────────────────────────────────────────────────
-
+//Matching Poly
 int graph_matching_count(const Graph *g, int k) {
     if (!g || k < 0) return 0;
     if (k == 0) return 1;
@@ -491,8 +478,7 @@ Poly *graph_matching_poly(const Graph *g) {
     return poly_normalize(result);
 }
 
-// ─── Tutte Polynomial ─────────────────────────────────────────────────────────
-
+//Tutte Polyn
 TuttePoly *tutte_create(int max_deg) {
     TuttePoly *t = (TuttePoly *)malloc(sizeof(TuttePoly));
     t->max_deg = max_deg;
@@ -563,7 +549,7 @@ TuttePoly *tutte_add(const TuttePoly *a, const TuttePoly *b) {
     return res;
 }
 
-// Tutte polynomial via deletion-contraction
+// Tutte poly via deletion-contraction
 // T(G) = T(G-e) + T(G/e)  for non-loop, non-bridge e
 // T(G) = y * T(G-e)        for loop e
 // T(G) = x * T(G/e)        for bridge e
@@ -580,23 +566,23 @@ TuttePoly *graph_tutte_poly(const Graph *g) {
     int e = graph_edge_count(g);
     int md = e + 2;
 
-    // Base case: no edges
+    //Base case: no edges
     if (e == 0) {
         TuttePoly *t = tutte_create(md);
         tutte_add_term(t, 0, 0, 1.0);  // T = 1
         return t;
     }
 
-    // Find first edge
+    //Find first edge
     int u = -1, v = -1;
     _first_edge(g, &u, &v);
 
     if (_is_bridge(g, u, v)) {
-        // T(G) = x * T(G/e)
+        //T(G) = x * T(G/e)
         Graph *g_con = _graph_contract_edge(g, u, v);
         TuttePoly *t_con = graph_tutte_poly(g_con);
         graph_destroy(g_con);
-        // Multiply by x: shift all x-degrees up by 1
+        //Multiply by x: shift all x-degrees up by 1
         TuttePoly *result = tutte_create(t_con->max_deg + 1);
         for (int i = 0; i <= t_con->max_deg; i++)
             for (int j = 0; j <= t_con->max_deg; j++)
@@ -605,7 +591,7 @@ TuttePoly *graph_tutte_poly(const Graph *g) {
         tutte_destroy(t_con);
         return result;
     } else {
-        // Regular edge: T(G) = T(G-e) + T(G/e)
+        //Regular edge: T(G) = T(G-e) + T(G/e)
         Graph *g_del = _graph_delete_edge(g, u, v);
         Graph *g_con = _graph_contract_edge(g, u, v);
         TuttePoly *t_del = graph_tutte_poly(g_del);
@@ -633,11 +619,10 @@ long graph_acyclic_orientations(const Graph *g) {
     return result;
 }
 
-// ─── Reliability Polynomial ───────────────────────────────────────────────────
-// R(G, p) = sum over all spanning subgraphs H that are connected:
-//           p^|E(H)| * (1-p)^(|E(G)| - |E(H)|)
-// We enumerate all edge subsets (works for small graphs)
-
+//Reliability Polyn
+// R(G, p)=sum over all spanning subgraphs H that are connected:
+//p^|E(H)| * (1-p)^(|E(G)| - |E(H)|)
+//We enumerate all edge subsets (works for small graphs)
 static int _subgraph_connected(const Graph *g, int mask, int *edges, int e) {
     // Build subgraph from edge mask and check connectivity
     int n = g->n;
@@ -671,8 +656,8 @@ Poly *graph_reliability_poly(const Graph *g) {
     int e = graph_edge_count(g);
     if (e > 20) return NULL;  // too large for enumeration
 
-    // R(G,p) = sum_{k=0}^{e} c_k * p^k * (1-p)^(e-k)
-    // where c_k = number of connected spanning subgraphs with exactly k edges
+    //R(G,p)=sum_{k=0}^{e} c_k * p^k * (1-p)^(e-k)
+    //where c_k=no of connected spanning subgraphs with exactly k edges
     int *ck = (int *)calloc(e + 1, sizeof(int));
     for (int mask = 0; mask < (1 << e); mask++) {
         int k = __builtin_popcount(mask);
@@ -716,8 +701,7 @@ double graph_reliability_eval(const Graph *g, double p) {
     return val;
 }
 
-// ─── File I/O ─────────────────────────────────────────────────────────────────
-
+//File I/O
 int graph_save(const Graph *g, const char *filename) {
     if (!g || !filename) return -1;
     FILE *f = fopen(filename, "w");
