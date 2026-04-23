@@ -56,5 +56,9 @@ double *poly_roots_real(const Poly *p,int *count);
 //File I/O
 int poly_save(const Poly *p,const char *filename);
 Poly *poly_load(const char *filename);
+Poly *poly_cyclotomic(int n);
+Poly *poly_mod_p(const Poly *p, int prime);
+int poly_is_irreducible_zp(const Poly *p,int prime);
+long poly_hash(const Poly *p, long base, long mod);
 
 #endif
