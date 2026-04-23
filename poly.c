@@ -358,3 +358,59 @@ Poly *poly_load(const char *filename) {
     fclose(f);
     return poly_normalize(p);
 }
+static void _get_divisors(int n,int *divs,int *ndivs) {
+    *ndivs=0;
+    for (int d=1;d<n;d++)
+        if (n%d==0) divs[(*ndivs)++]=d;
+}
+
+Poly *poly_cyclotomic(int n){
+    if(n<=0) return NULL;
+    Poly *num=poly_create(n);
+    num->coeffs[0] = -1.0;
+    num->coeffs[n] =  1.0;
+    int divs[256], ndivs;
+    _get_divisors(n, divs, &ndivs);
+    for(int i=0;i<ndivs;i++) {
+        Poly *phi_d=poly_cyclotomic(divs[i]);
+        Poly **dm=poly_divmod(num, phi_d);
+        poly_destroy(num); poly_destroy(phi_d);
+        num = dm[0]; poly_destroy(dm[1]); free(dm);
+    }
+    return poly_normalize(num);
+}
+
+Poly *poly_mod_p(const Poly *p,int prime){
+    if(!p || prime <= 0) return NULL;
+    Poly *result=poly_copy(p);
+    for (int i=0; i<=result->degree;i++) {
+        long c=(long)round(result->coeffs[i]);
+        result->coeffs[i]=(double)(((c % prime)+prime)%prime);
+    }
+    return poly_normalize(result);
+}
+
+int poly_is_irreducible_zp(const Poly *p,int prime){
+    if (!p || p->degree <= 0) return 0;
+    if (p->degree == 1) return 1;
+    for(int x=0;x<prime;x++){
+        double val=0.0,xpow=1.0;
+        for (int i=0; i<=p->degree;i++) {
+            val+=round(p->coeffs[i])*xpow;
+            xpow*=x;
+        }
+        if(((long)round(val)%prime+prime)%prime==0) return 0;
+    }
+    return 1;
+}
+
+long poly_hash(const Poly *p,long base,long mod){
+    if(!p || mod<=0) return 0;
+    long result=0;
+    for(int i=p->degree;i>=0;i--) {
+        long c=((long)round(p->coeffs[i])%mod+mod)%mod;
+        result=(long)((__int128)result*base%mod);
+        result=(result+c)%mod;
+    }
+    return result;
+}
