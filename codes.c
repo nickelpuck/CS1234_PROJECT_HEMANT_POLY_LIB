@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <crypto.h>
 
 //Reed-Solomon 
 RSCode *rs_create(int n, int k) {
